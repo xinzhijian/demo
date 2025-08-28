@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1, user-scalable=no"
+    />
+
+    <script>
+      (function () {
+        function resetFontSize() {
+          var baseFontSize = 100;
+          var designWidth = 750;
+          var width = window.innerWidth;
+          var currentFontSize = (width / designWidth) * baseFontSize;
+          document.getElementsByTagName("html")[0].style.fontSize =
+            currentFontSize + "px";
+        }
+        window.onresize = function () {
+          resetFontSize();
+        };
+        resetFontSize();
+      })();
+    </script>
+    <title>儿童找茬游戏</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Comic Sans MS", "Marker Felt", "Arial Rounded MT Bold",
+          sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #6ecbf5 0%, #e6a8d7 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        overflow-x: hidden;
+      }
+
+      .header {
+        text-align: center;
+        margin: 15px 0 25px;
+        width: 100%;
+        max-width: 900px;
+        position: relative;
+      }
+
+      h1 {
+        color: #ff6b6b;
+        font-size: 28px;
+        text-shadow: 3px 3px 0 #ffd166, 5px 5px 0 rgba(0, 0, 0, 0.1);
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+      }
+
+      .game-container {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        padding: 25px;
+        width: 100%;
+        max-width: 900px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .stats-bar {
+        display: flex;
+        line-height: 44px;
+        justify-content: space-between;
+        width: 100%;
+        height: 88px;
+        margin-bottom: 25px;
+        background: linear-gradient(to right, #ff9a9e, #fad0c4);
+        padding: 15px 25px;
+        border-radius: 50px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .timer,
+      .differences {
+        font-size: 13px;
+        font-weight: bold;
+        color: #5e548e;
+        /* display: flex; */
+        align-items: center;
+        gap: 10px;
+      }
+
+      .timer span,
+      .differences span {
+        background: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .images-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 25px;
+        width: 100%;
+      }
+
+      .image-box {
+        position: relative;
+        border: 8px solid #a2d2ff;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        background-color: #fff;
+        width: 400px;
+        height: 300px;
+        cursor: pointer;
+      }
+
+      .image-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .controls {
+        display: flex;
+        gap: 20px;
+        margin-top: 15px;
+      }
+
+      button {
+        background: linear-gradient(to bottom, #ff9a9e, #fad0c4);
+        border: none;
+        border-radius: 50px;
+        color: #5e548e;
+        cursor: pointer;
+        height: 49px;
+        font-size: 13px;
+        font-weight: bold;
+        padding: 12px 35px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        background: linear-gradient(to bottom, #ff7eb3, #ff758c);
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .instructions {
+        background: #ffd166;
+        border-radius: 20px;
+        padding: 20px;
+        margin-top: 25px;
+        width: 100%;
+        max-width: 900px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        color: #5e548e;
+      }
+
+      .instructions h2 {
+        text-align: center;
+        margin-bottom: 15px;
+        color: #ef476f;
+        font-size: 40px;
+      }
+
+      .instructions ul {
+        padding-left: 25px;
+        font-size: 15px;
+      }
+
+      .instructions li {
+        margin-bottom: 10px;
+      }
+
+      .difference-marker {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border: 4px solid #ff006e;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: pulse 1s infinite;
+      }
+
+      .found {
+        border-color: #06d6a0;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 0.8;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 0.8;
+        }
+      }
+
+      .game-over {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+
+      .game-over.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .result-box {
+        background: linear-gradient(135deg, #ff9a9e, #a2d2ff);
+        border-radius: 25px;
+        padding: 40px;
+        text-align: center;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .result-title {
+        color: white;
+        font-size: 3rem;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .result-text {
+        font-size: 1.8rem;
+        color: #5e548e;
+        margin-bottom: 30px;
+        line-height: 1.4;
+      }
+
+      .celebration {
+        position: absolute;
+        font-size: 3rem;
+        opacity: 0;
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      @media (max-width: 850px) {
+        .images-container {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .image-box {
+          width: 100%;
+          max-width: 400px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>大家来找茬</h1>
+      <div class="stats-bar">
+        <div class="timer">⏱️ 剩余时间: <span id="time">05:00</span></div>
+        <div class="differences">🔍 找到: <span id="found">0</span>/5</div>
+      </div>
+    </div>
+
+    <div class="game-container">
+      <div class="images-container">
+        <div class="image-box" id="image1">
+          <img id="img1" src="" alt="找茬图片左" />
+        </div>
+        <div class="image-box" id="image2">
+          <img id="img2" src="" alt="找茬图片右" />
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="hintBtn">💡 提示</button>
+        <button id="restartBtn">🔄 重新开始</button>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <h2>游戏说明</h2>
+      <ul>
+        <li>找出左右两张图片的<strong>5个不同之处</strong></li>
+        <li>每局游戏限时<strong>5分钟</strong></li>
+        <li>点击图片中你认为不同的地方</li>
+        <li>点击"提示"按钮会高亮显示一个还未找到的不同之处</li>
+        <li>每张图片都有5个不同之处，找到所有不同即可获胜</li>
+      </ul>
+    </div>
+
+    <div class="game-over" id="gameOver">
+      <div class="result-box">
+        <h2 class="result-title" id="resultTitle">游戏结束</h2>
+        <p class="result-text" id="resultText"></p>
+        <button id="playAgainBtn">🎮 再玩一次</button>
+      </div>
+    </div>
+
+    <script>
+      // 游戏状态
+      const gameState = {
+        differences: 5,
+        foundCount: 0,
+        timeLeft: 300, // 5分钟 = 300秒
+        timer: null,
+        currentImageSet: 0,
+        differencesPositions: [],
+        foundPositions: [],
+      };
+
+      // 10组图片（左右各一张，建议替换为你自己的图片URL）
+      const imageSets = [
+        {
+          name: "森林动物聚会",
+          left: "/images/1.jpg",
+          right: "/images/1.jpg",
+        },
+        {
+          name: "海底世界探险",
+          left: "/images/2.jpg",
+          right: "/images/2_right.jpg",
+        },
+        {
+          name: "太空冒险旅程",
+          left: "/images/3.jpg",
+          right: "/images/3_right.jpg",
+        },
+        {
+          name: "糖果王国奇遇",
+          left: "/images/4_left.jpg",
+          right: "/images/4_right.jpg",
+        },
+      ];
+
+      // 预定义的不同位置（示例，需与图片实际不同点对应）
+      const allDifferences = [
+        [
+          { x: 120, y: 80 },
+          { x: 250, y: 120 },
+          { x: 180, y: 200 },
+          { x: 90, y: 150 },
+          { x: 300, y: 180 },
+        ],
+        [
+          { x: 100, y: 70 },
+          { x: 220, y: 150 },
+          { x: 150, y: 220 },
+          { x: 320, y: 90 },
+          { x: 280, y: 200 },
+        ],
+        [
+          { x: 80, y: 60 },
+          { x: 200, y: 100 },
+          { x: 170, y: 210 },
+          { x: 110, y: 170 },
+          { x: 310, y: 160 },
+        ],
+        [
+          { x: 130, y: 90 },
+          { x: 240, y: 130 },
+          { x: 190, y: 210 },
+          { x: 100, y: 160 },
+          { x: 290, y: 190 },
+        ],
+      ];
+
+      // 初始化游戏
+      function initGame() {
+        // 重置游戏状态
+        clearInterval(gameState.timer);
+        gameState.foundCount = 0;
+        gameState.timeLeft = 300;
+        gameState.foundPositions = [];
+
+        // 随机选择一组图片
+        gameState.currentImageSet = Math.floor(
+          Math.random() * imageSets.length
+        );
+
+        // 设置图片
+        document.getElementById("img1").src =
+          imageSets[gameState.currentImageSet].left;
+        document.getElementById("img2").src =
+          imageSets[gameState.currentImageSet].right;
+
+        // 设置不同位置
+        gameState.differencesPositions =
+          allDifferences[gameState.currentImageSet % allDifferences.length];
+
+        // 更新UI
+        document.getElementById("found").textContent = gameState.foundCount;
+        document.getElementById("time").textContent = formatTime(
+          gameState.timeLeft
+        );
+
+        // 清除所有标记
+        document
+          .querySelectorAll(".difference-marker")
+          .forEach((marker) => marker.remove());
+
+        // 开始计时
+        startTimer();
+
+        // 隐藏游戏结束界面
+        document.getElementById("gameOver").classList.remove("active");
+      }
+
+      // 开始计时器
+      function startTimer() {
+        gameState.timer = setInterval(() => {
+          gameState.timeLeft--;
+          document.getElementById("time").textContent = formatTime(
+            gameState.timeLeft
+          );
+
+          if (gameState.timeLeft <= 0) {
+            endGame(false);
+          }
+        }, 1000);
+      }
+
+      // 格式化时间显示
+      function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60)
+          .toString()
+          .padStart(2, "0");
+        const secs = (seconds % 60).toString().padStart(2, "0");
+        return `${mins}:${secs}`;
+      }
+
+      // 处理图片点击
+      function handleImageClick(event, imageId) {
+        if (
+          gameState.foundCount >= gameState.differences ||
+          gameState.timeLeft <= 0
+        )
+          return;
+
+        const rect = event.target.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        // 检查是否点击到了不同之处
+        for (let i = 0; i < gameState.differencesPositions.length; i++) {
+          const diff = gameState.differencesPositions[i];
+          const distance = Math.sqrt(
+            Math.pow(diff.x - x, 2) + Math.pow(diff.y - y, 2)
+          );
+
+          if (distance < 30 && !gameState.foundPositions.includes(i)) {
+            // 找到了一处不同
+            gameState.foundCount++;
+            gameState.foundPositions.push(i);
+            document.getElementById("found").textContent = gameState.foundCount;
+
+            // 创建标记
+            createMarker(diff.x, diff.y, imageId);
+
+            // 添加庆祝效果
+            addCelebration(event.clientX, event.clientY);
+
+            // 检查游戏是否胜利
+            if (gameState.foundCount >= gameState.differences) {
+              endGame(true);
+            }
+
+            return;
+          }
+        }
+
+        // 如果没找到不同之处，显示提示
+        event.target.style.transform = "translateX(5px)";
+        setTimeout(() => {
+          event.target.style.transform = "";
+        }, 200);
+      }
+
+      // 创建不同之处标记
+      function createMarker(x, y, parentId) {
+        const marker = document.createElement("div");
+        marker.className = "difference-marker";
+        marker.style.left = `${x - 15}px`;
+        marker.style.top = `${y - 15}px`;
+
+        document.getElementById(parentId).appendChild(marker);
+
+        // 在另一张图片上添加标记
+        const otherImageId = parentId === "image1" ? "image2" : "image1";
+        const marker2 = document.createElement("div");
+        marker2.className = "difference-marker";
+        marker2.style.left = `${x - 15}px`;
+        marker2.style.top = `${y - 15}px`;
+
+        document.getElementById(otherImageId).appendChild(marker2);
+
+        // 标记为已找到
+        setTimeout(() => {
+          marker.classList.add("found");
+          marker2.classList.add("found");
+        }, 500);
+      }
+
+      // 添加庆祝效果
+      function addCelebration(x, y) {
+        const emojis = ["🎉", "🎊", "✨", "🌟", "💫", "🥳", "👍", "👏"];
+        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+        const celebration = document.createElement("div");
+        celebration.className = "celebration";
+        celebration.textContent = emoji;
+        celebration.style.left = `${x}px`;
+        celebration.style.top = `${y}px`;
+
+        document.body.appendChild(celebration);
+
+        // 动画效果
+        setTimeout(() => {
+          celebration.style.transition = "all 1s ease";
+          celebration.style.opacity = "1";
+          celebration.style.transform = `translateY(${
+            -Math.random() * 100 - 50
+          }px) translateX(${(Math.random() - 0.5) * 100}px)`;
+
+          setTimeout(() => {
+            celebration.style.opacity = "0";
+            setTimeout(() => {
+              celebration.remove();
+            }, 1000);
+          }, 500);
+        }, 10);
+      }
+
+      // 提供提示
+      function giveHint() {
+        if (
+          gameState.foundCount >= gameState.differences ||
+          gameState.timeLeft <= 0
+        )
+          return;
+
+        // 找到第一个未发现的不同之处
+        for (let i = 0; i < gameState.differencesPositions.length; i++) {
+          if (!gameState.foundPositions.includes(i)) {
+            const diff = gameState.differencesPositions[i];
+
+            // 创建闪烁提示
+            const hintMarker1 = document.createElement("div");
+            hintMarker1.className = "difference-marker";
+            hintMarker1.style.left = `${diff.x - 15}px`;
+            hintMarker1.style.top = `${diff.y - 15}px`;
+            hintMarker1.style.borderColor = "#ffd166";
+            hintMarker1.style.zIndex = "5";
+
+            const hintMarker2 = document.createElement("div");
+            hintMarker2.className = "difference-marker";
+            hintMarker2.style.left = `${diff.x - 15}px`;
+            hintMarker2.style.top = `${diff.y - 15}px`;
+            hintMarker2.style.borderColor = "#ffd166";
+            hintMarker2.style.zIndex = "5";
+
+            document.getElementById("image1").appendChild(hintMarker1);
+            document.getElementById("image2").appendChild(hintMarker2);
+
+            // 3秒后移除提示
+            setTimeout(() => {
+              hintMarker1.remove();
+              hintMarker2.remove();
+            }, 3000);
+
+            break;
+          }
+        }
+      }
+
+      // 结束游戏
+      function endGame(isWin) {
+        clearInterval(gameState.timer);
+
+        const gameOver = document.getElementById("gameOver");
+        const resultTitle = document.getElementById("resultTitle");
+        const resultText = document.getElementById("resultText");
+
+        if (isWin) {
+          resultTitle.textContent = "恭喜你赢了!";
+          resultText.textContent = `你找到了所有不同之处！用时 ${formatTime(
+            300 - gameState.timeLeft
+          )}`;
+          resultTitle.style.color = "#06d6a0";
+
+          // 添加大量庆祝效果
+          for (let i = 0; i < 30; i++) {
+            setTimeout(() => {
+              addCelebration(
+                Math.random() * window.innerWidth,
+                Math.random() * window.innerHeight
+              );
+            }, i * 100);
+          }
+        } else {
+          resultTitle.textContent = "时间到了!";
+          resultText.textContent = `你找到了 ${gameState.foundCount} 个不同之处，继续努力！`;
+          resultTitle.style.color = "#ff6b6b";
+        }
+
+        gameOver.classList.add("active");
+      }
+
+      // 事件监听
+      document
+        .getElementById("image1")
+        .addEventListener("click", (e) => handleImageClick(e, "image1"));
+      document
+        .getElementById("image2")
+        .addEventListener("click", (e) => handleImageClick(e, "image2"));
+      document.getElementById("hintBtn").addEventListener("click", giveHint);
+      document.getElementById("restartBtn").addEventListener("click", initGame);
+      document
+        .getElementById("playAgainBtn")
+        .addEventListener("click", initGame);
+
+      // 初始化游戏
+      window.addEventListener("load", initGame);
+    </script>
+  </body>
+</html>
