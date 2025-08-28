@@ -286,7 +286,7 @@
   </head>
   <body>
     <div class="header">
-      <h1>大家来找茬</h1>
+      <h1>森林防火demo</h1>
       <div class="stats-bar">
         <div class="timer">⏱️ 剩余时间: <span id="time">05:00</span></div>
         <div class="differences">🔍 找到: <span id="found">0</span>/5</div>
@@ -296,9 +296,8 @@
     <div class="game-container">
       <div class="images-container">
         <div class="image-box" id="image1">
-          <img id="img1" src="" alt="找茬图片左" />
+          <img id="img1" src="" alt="" />
         </div>
-
       </div>
 
       <div class="controls">
@@ -343,22 +342,18 @@
         {
           name: "森林动物聚会",
           left: "./images/1.jpg",
-
         },
         {
           name: "海底世界探险",
           left: "./images/2.jpg",
-
         },
         {
           name: "太空冒险旅程",
           left: "./images/3.jpg",
-
         },
         {
           name: "糖果王国奇遇",
           left: "./images/4.jpg",
-
         },
       ];
 
@@ -376,21 +371,18 @@
           { x: 220, y: 150 },
           { x: 150, y: 220 },
           { x: 320, y: 90 },
-          { x: 280, y: 200 },
         ],
         [
           { x: 80, y: 60 },
           { x: 200, y: 100 },
           { x: 170, y: 210 },
           { x: 110, y: 170 },
-          { x: 310, y: 160 },
         ],
         [
           { x: 130, y: 90 },
           { x: 240, y: 130 },
           { x: 190, y: 210 },
           { x: 100, y: 160 },
-          { x: 290, y: 190 },
         ],
       ];
 
@@ -489,7 +481,13 @@
 
             // 检查游戏是否胜利
             if (gameState.foundCount >= gameState.differences) {
-              endGame(true);
+              if(gameState.currentImageSet < imageSets.length - 1) {
+                gameState.currentImageSet++;
+                initGame();
+              } else {
+                endGame(true);
+              }
+              
             }
 
             return;
