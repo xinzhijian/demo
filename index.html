@@ -63,7 +63,7 @@
         background-color: rgba(255, 255, 255, 0.9);
         border-radius: 20px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        padding: 25px;
+        padding: 10px;
         width: 100%;
         max-width: 900px;
         display: flex;
@@ -118,7 +118,7 @@
         overflow: hidden;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
         background-color: #fff;
-        width: 400px;
+        width: 100%;
         height: 300px;
         cursor: pointer;
       }
@@ -251,13 +251,13 @@
 
       .result-title {
         color: white;
-        font-size: 3rem;
+        font-size: 10px;
         margin-bottom: 20px;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       }
 
       .result-text {
-        font-size: 1.8rem;
+        font-size: 12px;
         color: #5e548e;
         margin-bottom: 30px;
         line-height: 1.4;
@@ -265,7 +265,7 @@
 
       .celebration {
         position: absolute;
-        font-size: 3rem;
+        font-size: 30px;
         opacity: 0;
         z-index: 10;
         pointer-events: none;
@@ -298,9 +298,7 @@
         <div class="image-box" id="image1">
           <img id="img1" src="" alt="找茬图片左" />
         </div>
-        <div class="image-box" id="image2">
-          <img id="img2" src="" alt="找茬图片右" />
-        </div>
+
       </div>
 
       <div class="controls">
@@ -345,22 +343,22 @@
         {
           name: "森林动物聚会",
           left: "./images/1.jpg",
-          right: "/images/1.jpg",
+
         },
         {
           name: "海底世界探险",
           left: "./images/2.jpg",
-          right: "/images/2_right.jpg",
+
         },
         {
           name: "太空冒险旅程",
           left: "./images/3.jpg",
-          right: "./images/3_right.jpg",
+
         },
         {
           name: "糖果王国奇遇",
-          left: "./images/4_left.jpg",
-          right: "/images/4_right.jpg",
+          left: "./images/4.jpg",
+
         },
       ];
 
@@ -371,7 +369,7 @@
           { x: 250, y: 120 },
           { x: 180, y: 200 },
           { x: 90, y: 150 },
-          { x: 300, y: 180 },
+          { x: 40, y: 60 },
         ],
         [
           { x: 100, y: 70 },
@@ -405,15 +403,13 @@
         gameState.foundPositions = [];
 
         // 随机选择一组图片
-        gameState.currentImageSet = Math.floor(
-          Math.random() * imageSets.length
-        );
+        // gameState.currentImageSet = Math.floor(
+        //   Math.random() * imageSets.length
+        // );
 
         // 设置图片
         document.getElementById("img1").src =
           imageSets[gameState.currentImageSet].left;
-        document.getElementById("img2").src =
-          imageSets[gameState.currentImageSet].right;
 
         // 设置不同位置
         gameState.differencesPositions =
@@ -517,12 +513,11 @@
         document.getElementById(parentId).appendChild(marker);
 
         // 在另一张图片上添加标记
-        const otherImageId = parentId === "image1" ? "image2" : "image1";
+        const otherImageId = "image1";
         const marker2 = document.createElement("div");
         marker2.className = "difference-marker";
         marker2.style.left = `${x - 15}px`;
         marker2.style.top = `${y - 15}px`;
-
         document.getElementById(otherImageId).appendChild(marker2);
 
         // 标记为已找到
@@ -551,7 +546,7 @@
           celebration.style.opacity = "1";
           celebration.style.transform = `translateY(${
             -Math.random() * 100 - 50
-          }px) translateX(${(Math.random() - 0.5) * 100}px)`;
+          }px) translateX(${(Math.random() - 0.5) * 10}px)`;
 
           setTimeout(() => {
             celebration.style.opacity = "0";
@@ -591,7 +586,6 @@
             hintMarker2.style.zIndex = "5";
 
             document.getElementById("image1").appendChild(hintMarker1);
-            document.getElementById("image2").appendChild(hintMarker2);
 
             // 3秒后移除提示
             setTimeout(() => {
@@ -641,9 +635,7 @@
       document
         .getElementById("image1")
         .addEventListener("click", (e) => handleImageClick(e, "image1"));
-      document
-        .getElementById("image2")
-        .addEventListener("click", (e) => handleImageClick(e, "image2"));
+
       document.getElementById("hintBtn").addEventListener("click", giveHint);
       document.getElementById("restartBtn").addEventListener("click", initGame);
       document
