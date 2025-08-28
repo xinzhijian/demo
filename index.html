@@ -23,7 +23,7 @@
         resetFontSize();
       })();
     </script>
-    <title>儿童找茬游戏</title>
+    <title>demo</title>
     <style>
       * {
         margin: 0;
@@ -202,6 +202,9 @@
       .found {
         border-color: #06d6a0;
       }
+      #playAgainBtn {
+        margin: 0 auto;
+      }
 
       @keyframes pulse {
         0% {
@@ -289,7 +292,7 @@
       <h1>森林防火demo</h1>
       <div class="stats-bar">
         <div class="timer">⏱️ 剩余时间: <span id="time">05:00</span></div>
-        <div class="differences">🔍 找到: <span id="found">0</span>/5</div>
+        <div class="differences">🔍 找到: <span id="found">0</span>/<text id="allDiff">0</text></div>
       </div>
     </div>
 
@@ -309,11 +312,10 @@
     <div class="instructions">
       <h2>游戏说明</h2>
       <ul>
-        <li>找出左右两张图片的<strong>5个不同之处</strong></li>
         <li>每局游戏限时<strong>5分钟</strong></li>
         <li>点击图片中你认为不同的地方</li>
         <li>点击"提示"按钮会高亮显示一个还未找到的不同之处</li>
-        <li>每张图片都有5个不同之处，找到所有不同即可获胜</li>
+        <li>当前图片有<span id="allDiff1">0</span>个不同之处，找到所有不同即可获胜</li>
       </ul>
     </div>
 
@@ -409,6 +411,9 @@
 
         // 更新UI
         document.getElementById("found").textContent = gameState.foundCount;
+        document.getElementById("allDiff").textContent = gameState.differences;
+        document.getElementById("allDiff1").textContent = gameState.differences;
+        
         document.getElementById("time").textContent = formatTime(
           gameState.timeLeft
         );
@@ -638,7 +643,10 @@
       document.getElementById("restartBtn").addEventListener("click", initGame);
       document
         .getElementById("playAgainBtn")
-        .addEventListener("click", initGame);
+        .addEventListener("click", () => {
+          gameState.currentImageSet = 0;
+          initGame()
+        });
 
       // 初始化游戏
       window.addEventListener("load", initGame);
